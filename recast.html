@@ -1,0 +1,81 @@
+<!doctype html>
+<html>
+<head>
+    <title>Redistribuie pe zile, un set de ore din orarul şcolar</title>
+    <meta name="description" content="redistribuie interactiv un subset de ore din orarul şcolar" />
+    <meta name="author" content="Vlad Bazon" />
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="static/recast.css">
+    <script src="static/jquery-1.11.1.min.js"></script>
+    <script src="static/jquery.ui.widget.min.js"></script>
+    <script src="static/recast.js"></script>
+</head>
+<body>
+<!--an interactive application (widget jQuery) for to conveniently modify a given set of hours of teachers in a school, keeping the classification of teachers by classes and the number of hours per day in each class -->
+<div>Distribuţia pe zile iniţială:</div>
+<textarea id="orar_zi" rows="4" cols="50" style="font-size:0.9em;color:#448">
+prof,Lu,Ma,Mi,Jo,Vi
+P56,6D 8D,10B 5B 6D 8D,10B 12B 5B 5C 6D,12B 5C,
+P59,6D 7D 8B,5E 7D 8B,5E,5D 5E,6D 7D
+P60,11C 12D 12E 9E,12D 12E,,11C,11C 12D 12E 9E
+P61,10C 5C 7A 7E,5B 5E 7C,5D,7D,5A
+P62,9C,10C 10D 12E 9C,,10A 10B 9D,10E 9D
+P63,12A,12A 12C,11A 12C 9A,11A 11B 9A,11B
+P64,11D,11D,11D 11E 9C 9D,11E 9C 9D,11E
+P65,6E 9A,5A 8C,5B 7D,7E,6C 8E
+P66,,5A 5B 9E,9D 9E,11E 9D,9D
+P67,7E,7E 8C,7E 8C,7E 8C,
+P68,5C,12B 5C,12B,8C,5C 8C
+P69,9B 9D,11C 5C 9C,5C,,11A
+P70,11A 9D,12A,,11B,12B 9A
+P72,10A 10C,10D 11E,10B,10E,
+P73,11E 12C 12E 9E,12E 9E,,,
+P74,10E,,10C 10D,,10E
+P76,7B,,,,7B
+P39,11A 12D 8C 8F,7E 8C 8D 8F,12E 7D 8D 8E,12E 7C 8E,11A 12A
+P40,11B 11D 8F 9A,11C 11D 8A 9A,8A 8B,11D 8B 9C,10E 11D 8F 9C
+P41,11E 12A 12D 7E,12D 7E 8D,12D 7A 8D 8E,12D 7A 8E 9E,11A 12C
+P42,10B 7B 9B 9E,5B 7B 9B 9E,10B 5B 9B 9E,10B 9B,10B 7B 9E
+P47,11A 7E 8A 9B,11A 12C 8A 8E,12C 8E,7E 8A 8E,7E 8A 9B
+P48,6E 8C 8D 9E,6C 6D 8B 9B,6A 8A,10B 6B 7B 8F,7B 8E
+P54,12E 6E 8F,12B 6E,12B 8F,12B 12E 6E 8F,12B 12E 6E 8F
+</textarea>
+
+<!--
+prof,Lu,Ma,Mi,Jo,Vi
+P56,6D 8D 5C,10B 5B 6D 8D,10B 12B 5B,12B 5C,6D
+P59,6D 7D 8B,5E 7D 8B,5E 6D 7D,5D 5E,
+P60,11C 12D 12E 9E,12D 12E,,11C 12D 12E,11C 9E
+P61,10C 7A 7E,5E 7C 5A,5D 5C 7D 5B,,
+P62,,12E 9C,10C 10D 9C,10A 10B 9D,10E 9D
+P63,12A 11A 11B,12A 12C,12C 9A,11A 11B 9A,
+P64,11D 9C,11D,11E 9D,11E 9C 9D,11E 11D
+P65,6E 9A,5A 5B,,7E 7D,6C 8E 8C
+P66,,5B 9E,9D 9E,11E 9D,9D 5A
+P67,7E,7E 8C,7E 8C,7E 8C,
+P68,5C 8C,12B 5C 8C,12B 5C,,
+P69,9B 9D,11C 5C 9C,,,11A 5C
+P70,11A 9D 12A,,,,12B 9A 11B
+P72,10A 10C,10D 11E,,10E 10B,
+P73,11E 12C 12E 9E,12E 9E,,,
+P74,10E,10C 10D,,,10E
+P76,7B,,,,7B
+P39,11A 12D 8F,7E 8C 8D,12E 8D 8E,7C 8E 8C 8F,11A 12A 12E 7D
+P40,11D 8F 9A,11C 11D 8A 9A,8A 8B 11D,11D 8B 9C 11B,10E 8F 9C
+P41,11E 12D 7E,12D 7E 8D 12A,12D 7A 8D 8E,7A 8E 9E,11A 12C 12D
+P42,10B 7B 9B 9E,5B 9B 9E 7B,10B 5B 9B 9E,10B 9B,10B 7B 9E
+P47,7E 8A 9B,11A 12C 8A 8E,12C 8E 11A,7E 8A 8E,7E 8A 9B
+P48,6E 8C 8D 9E,6C 6D 8B 9B,6A 8A 10B,6B 8F 7B,7B 8E
+P54,12E 6E 8F,12B 6E 8F,12B 8F,12B 12E 6E,12B 12E 6E 8F
+</textarea-->   
+<!--<div id="orar-help"></div>-->
+
+<script>
+$(function() {
+    $('#orar_zi').recast();
+
+});
+</script>
+
+</body>
+</html>
