@@ -17,11 +17,6 @@
         return $(bar.join(''));
     };
 
-    function SWAP(dcls, td2) { 
-        td2.append(dcls);
-        dcls.parent().children().find(dcls).remove();
-    };
-   
     $.widget("vb.recast", {
         _create: function() { 
             BAR().insertAfter(this.element);
@@ -106,7 +101,6 @@
             this.element.prev().hide();
             this.element.hide();
             $('#grid-orar table').html($(html.join('')));
-          //  $('#grid-orar table tr th:first-child').css('cursor', 'pointer');
         },
         
         _set_handlers: function() {
@@ -202,7 +196,8 @@
                         let id1 = td1.index(), 
                             id2 = td2.index();
                         Self.hist.push([td1.parent().index(), id1, id2].join(', '));
-                        SWAP(dCls, td2);
+                        td2.append(dCls);
+                        dCls.parent().children().find(dCls).remove();
                     }
                 }
                 got.find('td, div').removeClass('gap-source')
@@ -252,10 +247,10 @@
             });
             
             bar.find('a').on('click', function(event){
-                let gridS = [];
+                let gridS = [['prof', 'Lu', 'Ma', 'Mi', 'Jo', 'Vi']];
                 got.find('tr:gt(0)').each(function() {
                     let grd = [];
-                    $(this).children().each(function(i, el) {  //console.log($(el).text());
+                    $(this).children().each(function(i, el) {
                         let qls = $(el).text();
                         if(i > 0) {
                             qls = qls.match(/\d*[A-Z]/g);
@@ -263,7 +258,7 @@
                         }
                         grd.push(qls);
                     });
-                    gridS.push(grd.join(','), '\n');
+                    gridS.push('\n', grd.join(','));
                 });  // alert(gridS);
                 $(event.target).prop({
                     'href': 'data:application/csv;charset=utf-8,' + 
