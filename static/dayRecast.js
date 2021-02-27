@@ -122,7 +122,7 @@
             
             bar.find('button:contains(Mark)').on('click', function(event) {
                 let clasa = $(this).prev().val(); 
-                if(!clasa) {
+                if(clasa == '') {
                     got.find('td').removeClass('highlight');
                     got.find('tr').toggle();
                 } else {
