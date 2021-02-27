@@ -122,9 +122,15 @@
             
             bar.find('button:contains(Mark)').on('click', function(event) {
                 let clasa = $(this).prev().val(); 
-                got.find('tr').toggle();
-                got.find('td:contains(' + clasa + ')').toggleClass('highlight').parent().show();
-                
+                if(!clasa) {
+                    got.find('td').removeClass('highlight');
+                    got.find('tr').toggle();
+                } else {
+                    got.find('tr').toggle();
+                    got.find('td:contains(' + clasa + ')')
+                       .toggleClass('highlight').parent().show();
+                    $(this).prev().val("");
+                };
             });
             
             bar.find('button:contains(Gaps)').on('click', function(event) {
@@ -232,6 +238,7 @@
                     }
                 }
                 got.find('td').removeClass('gap-source').removeClass('gap-dest');
+                got.find('td.highlight').removeClass('highlight');
             });
             
             bar.find('button:contains(Undo)').on('click', function(event) {
