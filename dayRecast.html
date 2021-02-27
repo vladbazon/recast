@@ -1,0 +1,99 @@
+<!doctype html>
+<html>
+<head>
+    <title>Orar interactiv</title>
+    <meta name="description" content="Repair gaps in a given school timetable of a day" />
+    <meta name="author" content="Vlad Bazon" />
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="static/dayRecast.css">
+    <script src="static/jquery-1.11.1.min.js"></script>
+    <script src="static/jquery.ui.widget.min.js"></script>
+    <script src="static/dayRecast.js"></script>
+</head>
+<body>
+<div>Orarul zilei:</div>  <!-- orar10.csv = 10 gaps -->
+<textarea id="orar_zi" rows="4" cols="50" style="font-size:0.9em;color:#448">
+P01,10B,12D,8D,10A,12B,-,-
+P02,-,7E,11C,6D,7A,12E,-
+P03,5D,8B,-,8E,11C,6E,-
+P04,-,-,-,7A,7C,6C,7C
+P05,9C,10E,12A,-,11B,12D,-
+P06,12E,9A,-,5D,5E,-,-
+P07,8A,9C,-,10E,5D,-,-
+P08,11A,5C,6D,12C,-,-,-
+P09,6C,6B,11A,11C,-,-,-
+P10,-,-,12B,11B,8D,10D,-
+P11,5B,6C,5A,-,8F,-,-
+P12,11B,12B,7C,-,-,-,-
+P13,10E,-,10D,7D,8B,-,-
+P14,10C,7C,9B,10D,-,-,-
+P15,10D,8D,8E,8B,-,-,-
+P16,-,-,9A,5C,10A,11A,-
+P17,8C,10D,6C,7E,-,-,-
+P18,-,-,5B,7C,6B,8D,-
+P19,5A,8F,9E,6E,-,-,-
+P20,7A,5D,7B,12D,-,-,-
+P21,9E,7B,11E,-,-,-,-
+P22,6B,8A,8F,8C,-,-,-
+P23,7D,8C,10C,9A,-,-,-
+P24,7C,6A,-,6B,9D,-,-
+P25,5C,12C,7A,-,-,-,-
+P26,-,-,10A,12B,6D,12C,-
+P27,8B,11D,7D,-,-,-,-
+P28,-,-,11B,11D,7D,12B,-
+P29,12C,8E,-,8A,10B,-,-
+P30,-,-,-,5B,5C,8E,-
+P31,11C,9B,5E,6C,-,-,-
+P32,-,-,-,5A,11E,11E,-
+P33,9A,10A,-,9D,-,-,-
+P34,12B,5B,11D,-,-,-,-
+P35,-,-,10B,6A,6C,9D,-
+P36,9D,12A,6A,-,-,-,-
+P37,11E,11B,6B,-,-,-,-
+P38,5E,5A,5D,-,-,-,-
+P39,-,-,-,11A,12D,8F,-
+P40,-,-,-,8F,9A,11D,-
+P41,12D,11E,7E,-,-,-,-
+P42,-,-,-,10B,7B,9B,-
+P43,6A,10B,10E,-,-,-,-
+P44,7B,5E,8A,-,-,-,-
+P45,-,7A,-,7B,12C,7D,-
+P46,-,-,-,9E,10C,6B,-
+P47,-,-,-,9B,8A,7E,-
+P48,6E,9E,8C,8D,-,-,-
+P49,8E,6E,9C,-,-,-,-
+P50,-,-,-,9C,9B,8C,-
+P51,-,-,-,-,8E,7C,-
+P52,11D,11C,12E,5E,-,-,-
+P53,-,-,-,-,9C,6D,-
+P54,8F,12E,6E,-,-,-,-
+P55,-,-,-,-,12A,5D,8C
+P56,8D,6D,-,-,-,-,-
+P57,-,-,-,-,6A,7B,7A
+P58,-,-,-,-,5B,8A,-
+P59,6D,7D,8B,-,-,-,-
+P60,-,-,12D,12E,9E,11C,-
+P61,-,-,-,10C,7E,7A,-
+P63,-,-,-,12A,11A,11B,-
+P64,-,-,-,-,11D,9C,-
+P65,-,-,-,-,6E,9A,-
+P67,7E,-,-,-,-,-,-
+P68,-,-,-,-,8C,5C,-
+P69,9B,9D,5C,-,-,-,-
+P70,12A,11A,9D,-,-,-,-
+P72,10A,10C,-,-,-,-,-
+P73,-,-,12C,11E,12E,9E,-
+P74,-,-,-,-,10E,10C,-
+P75,-,-,-,-,10D,10B,-
+P76,-,-,-,-,-,-,7B
+</textarea>   
+
+<script>
+$(function() {
+    $('#orar_zi').orarwg({});
+
+});
+</script>
+
+</body>
+</html>
