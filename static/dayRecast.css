@@ -23,4 +23,7 @@ td.gap-source, td.gap-dest {
 }
 
 td:first-child { background:#F4F6F6 }
-
+button#applyHIST {
+    display:none;
+    margin-left:1em;
+}

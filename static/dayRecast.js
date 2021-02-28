@@ -5,12 +5,12 @@
                 '<table border="1" cellspacing="2" cellpadding="1"></table>',
             '</div>',
             '<div id="tools-bar" style="float:left;padding-left:2em;margin-top:20px">',
-                '<p style="padding-right:1em"><button title="reÎNCARCĂ orarul iniţial">Load</button></p>',
+                '<p style="padding-right:1em"><button title="reÎNCARCĂ orarul iniţial">Load</button><button id="applyHIST">applyHIST</button></p>',
                 '<p><input value="9A"><button title="COMUTĂ orar/orar_clasă">Mark</button></p>',
                 '<p><button title="COMUTĂ orar/orar_ferestre">Gaps</button>&thinsp;<span></span>&thinsp;|<span></span></p>',
                 '<p><button title="INTERSCHIMBĂ orele marcate, pe coloanele respective">SWAP</button></p>',
                 '<p><button title="ANULEAZĂ operaţii SWAP, începând cu ultima">Undo</button></p>',
-                '<p><a title="SALVEAZĂ orarul curent (CSV)">Export</a></p>',
+                '<p><a title="SALVEAZĂ orarul curent (CSV) şi istoricul SWAP">Export</a></p>',
             '</div>'
         ];
         return $(bar.join(''));
@@ -30,7 +30,7 @@
         td2.text(x1);
     };
    
-    $.widget("vb.orarwg", {
+    $.widget("vb.dayRecast", {
         _create: function() { 
             BAR().insertAfter(this.element);
             $('#tools-bar').find('p:gt(0)').hide();
@@ -41,13 +41,18 @@
         
         _set_orar: function() {
             if(! this.element.val()) return;
+            let txt = this.element.val().trim();  //lines = this.element.val().trim().split(/\n/);
+            let spl = txt.split("History:");
+            let lines = spl[0].trim().split(/\n/),
+            HIST = [];
+            if(spl.length == 2) HIST = spl[1].trim().split(/\n/);
             let orar = [];
-            let lines = this.element.val().trim().split(/\n/);
             $.each(lines, function(i, el) {
                 orar.push(el.split(','));
             });
             if(collision()) return;      
-            this.spread = set_spread();  
+            this.spread = set_spread(); 
+            this.HIST = HIST;
             return orar; // $('#grid-orar').next().html(JSON.stringify(orar, null, 2));
          
             function collision() {
@@ -93,7 +98,7 @@
                 html.push('<tr><td>', el[0], '</td>');
                 for(let i=1, n=el.length; i < n; ++i) {
                     if(el[i] != '-')
-                        html.push('<td class="collate">', el[i], '</td>');
+                        html.push('<td>', el[i], '</td>');
                     else
                         html.push('<td>', el[i], '</td>');
                 }
@@ -105,6 +110,10 @@
             $('#grid-orar table').html($(html.join('')));
             $('#tools-bar').find('span:first').text(scor)
                                               .next().text('');  // initial gaps
+            if(this.HIST.length > 0)
+                $('button#applyHIST').show();
+            else 
+                $('button#applyHIST').off();
         },
         
         _set_handlers: function() {
@@ -120,11 +129,56 @@
                 Self._init();                
             });
             
+            $("button#applyHIST").on('click', function(event) {  //console.log(Self.HIST);
+                let horar = [],  // NU = Self.orar (modificarea s-ar face pe Self.orar)
+                    hst = Self.HIST;
+                for(let i=0, n=Self.orar.length; i < n; i++) {
+                    horar[i] = [];
+                    for(let j=0, m = Self.orar[i].length; j < m; j++) 
+                        horar[i][j] = Self.orar[i][j];
+                } 
+                for(let r12 of hst) {
+                    let swp = r12.split(','),
+                        row = parseInt(swp[0]),  // index prof. la care SWAP
+                        t1 = parseInt(swp[1]),   // index '-' destinaţie
+                        t2 = parseInt(swp[2]);   // index clasă de mutat
+                    let sig = '-'; 
+                    let cls = horar[row][t1];
+                    horar[row][t1] = sig;
+                    horar[row][t2] = cls;
+                    do {
+                        for(let i=0, hn=horar.length; i < hn; i++)
+                            if(i != row && horar[i][t2] == cls) {
+                                row = i;
+                                break;
+                            }
+                        cls = horar[row][t1];
+                        horar[row][t1] = horar[row][t2];
+                        horar[row][t2] = cls;
+                    } while(cls != sig);
+                }
+                // console.log(horar, Self.orar);
+                let html = [], scor=0;
+                $.each(horar, function(i, el) {
+                    scor += gaps(el);
+                    html.push('<tr><td>', el[0], '</td>');
+                    for(let i=1, n=el.length; i < n; ++i) {
+                        if(el[i] != '-')
+                            html.push('<td>', el[i], '</td>');
+                        else
+                            html.push('<td>', el[i], '</td>');
+                    }
+                    html.push('</tr>');
+                });
+                bar.find('span:last').text(scor);  // alert(scor);
+                $('#grid-orar table').html($(html.join('')));
+            });
+            
             bar.find('button:contains(Mark)').on('click', function(event) {
                 let clasa = $(this).prev().val(); 
                 if(clasa == '') {
                     got.find('td').removeClass('highlight');
-                    got.find('tr').toggle();
+                    got.find('tr').show();
                 } else {
                     got.find('tr').toggle();
                     got.find('td:contains(' + clasa + ')')
@@ -215,7 +269,7 @@
                     if(td2.length == 1) {
                         let id1 = td1.index(), 
                             id2 = td2.index();
-                            Self.hist.push([td1.parent().index(), id1, id2].join(', '));
+                            Self.hist.push([td1.parent().index(), id2, id1].join(', '));
                             let sig = '-';
                             SWAP(td1, td2);
                             do { 
@@ -245,31 +299,96 @@
                 if(Self.hist.length > 0) {
                     var last = Self.hist.pop().split(',');
                     var tr = got.find('tr').eq(last[0])
-                                .find('td').eq(last[2]).addClass('gap-source')
+                                .find('td').eq(last[1]).addClass('gap-source')
                                 .end()
-                                .eq(last[1]).addClass('gap-dest');
+                                .eq(last[2]).addClass('gap-dest');
                     bar.find('button:contains(SWAP)').click();
                     Self.hist.pop();
                 }
             });
 
             bar.find('a').on('click', function(event){
-                var grid = got[0];
-                var gridS = '';
-                var cols = grid.rows[0].cells.length - 1;
-                for(var i=0, rl=grid.rows.length; i < rl; i++) {
-                    for(var j=0; j < cols; j++)
+                let grid = got[0];
+                let gridS = '';
+                let cols = grid.rows[0].cells.length - 1;
+                for(let i=0, rl=grid.rows.length; i < rl; i++) {
+                    for(let j=0; j < cols; j++)
                         gridS += grid.rows[i].cells[j].innerHTML + ",";
-                    gridS += grid.rows[i].cells[cols].innerHTML + "\r\n"; // "\n"
+                    gridS += grid.rows[i].cells[cols].innerHTML + "\r\n";
                 }
+                gridS += "\r\n\r\nHistory:\r\n";
+                gridS += Self.hist.join('\r\n') + "\r\n";
+                let finm = 'Recast' + bar.find('span:last').text() + '.csv';
                 $(event.target).prop({
                     'href': 'data:application/csv;charset=utf-8,' + encodeURIComponent(gridS),
                     'target': '_blank',
-                    'download': 'ret_orar.csv'
+                    'download': finm
                 });
-               // alert(Self.hist.join('\n'));
             });
             
         }
     });
 })(jQuery);
+
+// hist = [ "49, 1, 6", "52, 3, 5", "42, 5, 6", "21, 4, 6", "36, 4, 6", "70, 3, 6", "70, 1, 3" ]
+// de la 60 gaps iniţial, la 50 gaps
+
+/* până la gaps=40:
+hist=["49, 1, 6",
+  "52, 3, 5",
+  "42, 5, 6",
+  "21, 4, 6",
+  "36, 4, 6",
+  "70, 3, 6",
+  "70, 1, 3",
+  "13, 4, 2",
+  "14, 4, 1",
+  "15, 5, 2",
+  "20, 4, 5",
+  "22, 2, 5",
+  "21, 3, 4",
+  "20, 2, 4",
+  "20, 4, 1",
+  "13, 2, 1",
+  "29, 5, 6",
+  "29, 3, 5",
+  "14, 1, 6",
+  "40, 3, 5",
+  "40, 5, 1",
+  "23, 3, 6",
+  "13, 4, 6",
+  "6, 5, 6",
+  "26, 3, 5",
+  "37, 4, 7",
+  "41, 3, 6",
+  "41, 4, 5",
+  "70, 2, 5",
+  "67, 5, 1",
+  "13, 4, 1",
+  "13, 6, 3",
+  "15, 2, 4",
+  "15, 3, 6",
+  "20, 3, 1",
+  "20, 4, 2",
+  "4, 5, 6",
+  "6, 4, 6",
+  "10, 3, 6",
+  "12, 3, 4",
+  "19, 3, 5",
+  "22, 3, 5",
+  "24, 3, 1",
+  "27, 4, 3",
+  "28, 3, 6",
+  "5, 3, 1",
+  "9, 3, 5",
+  "15, 3, 5",
+  "2, 3, 5",
+  "15, 3, 1",
+  "15, 4, 5",
+  "21, 3, 4",
+  "12, 3, 1",
+  "23, 3, 6",
+  "10, 3, 1"]
+*/
+
+
