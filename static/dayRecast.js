@@ -41,7 +41,7 @@
         
         _set_orar: function() {
             if(! this.element.val()) return;
-            let txt = this.element.val().trim();  //lines = this.element.val().trim().split(/\n/);
+            let txt = this.element.val().trim(); 
             let spl = txt.split("History:");
             let lines = spl[0].trim().split(/\n/),
             HIST = [];
@@ -53,7 +53,7 @@
             if(collision()) return;      
             this.spread = set_spread(); 
             this.HIST = HIST;
-            return orar; // $('#grid-orar').next().html(JSON.stringify(orar, null, 2));
+            return orar; 
          
             function collision() {
                 let err = []
@@ -108,8 +108,8 @@
             this.element.prev().hide();
             this.element.hide();
             $('#grid-orar table').html($(html.join('')));
-            $('#tools-bar').find('span:first').text(scor)
-                                              .next().text('');  // initial gaps
+            $('#tools-bar').find('span:first')
+                           .text(scor).next().text('');  // initial gaps
             if(this.HIST.length > 0)
                 $('button#applyHIST').show();
             else 
@@ -129,7 +129,7 @@
                 Self._init();                
             });
             
-            $("button#applyHIST").on('click', function(event) {  //console.log(Self.HIST);
+            $("button#applyHIST").on('click', function(event) {
                 let horar = [],  // NU = Self.orar (modificarea s-ar face pe Self.orar)
                     hst = Self.HIST;
                 for(let i=0, n=Self.orar.length; i < n; i++) {
@@ -140,8 +140,8 @@
                 for(let r12 of hst) {
                     let swp = r12.split(','),
                         row = parseInt(swp[0]),  // index prof. la care SWAP
-                        t1 = parseInt(swp[1]),   // index '-' destinaţie
-                        t2 = parseInt(swp[2]);   // index clasă de mutat
+                        t1 = parseInt(swp[1]),   // referă coloana sursă (a clasei de mutat)
+                        t2 = parseInt(swp[2]);   // referă coloana destinaţie (loc iniţial '-')
                     let sig = '-'; 
                     let cls = horar[row][t1];
                     horar[row][t1] = sig;
@@ -157,7 +157,6 @@
                         horar[row][t2] = cls;
                     } while(cls != sig);
                 }
-                // console.log(horar, Self.orar);
                 let html = [], scor=0;
                 $.each(horar, function(i, el) {
                     scor += gaps(el);
@@ -170,21 +169,23 @@
                     }
                     html.push('</tr>');
                 });
-                bar.find('span:last').text(scor);  // alert(scor);
+                bar.find('span:last').text(scor);
                 $('#grid-orar table').html($(html.join('')));
             });
             
             bar.find('button:contains(Mark)').on('click', function(event) {
-                let clasa = $(this).prev().val(); 
+                let clasa = $(this).prev().val();
                 if(clasa == '') {
                     got.find('td').removeClass('highlight');
                     got.find('tr').show();
                 } else {
-                    got.find('tr').toggle();
-                    got.find('td:contains(' + clasa + ')')
-                       .toggleClass('highlight').parent().show();
-                    $(this).prev().val("");
-                };
+                    if(Self.spread[clasa]) {
+                        got.find('tr').toggle();
+                        got.find('td:contains(' + clasa + ')')
+                           .toggleClass('highlight').parent().show();
+                        $(this).prev().val("");
+                    } else {alert(clasa + " nu există în orar");}
+                }    
             });
             
             bar.find('button:contains(Gaps)').on('click', function(event) {
@@ -281,14 +282,14 @@
                                                    .filter(function() {
                                                         return $(this).index() == id2;})
                                  if(!(td1.length && td2.length)) {
-                                    alert('Lipseşte o clasă, pe coloană!\n(a folosi "undo")');
+                                    alert('Lipseşte o clasă, pe coloană!\n(a folosi imediat "Undo")\n');
                                     break;
                                  }
                                  SWAP(td1, td2);
                                  td1 = td2;
                              } while(td1.text() != sig);
                          
-                         bar.find('span:last').text(get_scor());  // current gaps
+                         bar.find('span:last').text(get_scor());
                     }
                 }
                 got.find('td').removeClass('gap-source').removeClass('gap-dest');
@@ -297,8 +298,8 @@
             
             bar.find('button:contains(Undo)').on('click', function(event) {
                 if(Self.hist.length > 0) {
-                    var last = Self.hist.pop().split(',');
-                    var tr = got.find('tr').eq(last[0])
+                    let last = Self.hist.pop().split(',');
+                    let tr = got.find('tr').eq(last[0])
                                 .find('td').eq(last[1]).addClass('gap-source')
                                 .end()
                                 .eq(last[2]).addClass('gap-dest');
@@ -309,7 +310,7 @@
 
             bar.find('a').on('click', function(event){
                 let grid = got[0];
-                let gridS = '';
+                let gridS = '';  console.log(Self.element.val());
                 let cols = grid.rows[0].cells.length - 1;
                 for(let i=0, rl=grid.rows.length; i < rl; i++) {
                     for(let j=0; j < cols; j++)
@@ -320,7 +321,8 @@
                 gridS += Self.hist.join('\r\n') + "\r\n";
                 let finm = 'Recast' + bar.find('span:last').text() + '.csv';
                 $(event.target).prop({
-                    'href': 'data:application/csv;charset=utf-8,' + encodeURIComponent(gridS),
+                    'href': 'data:application/csv;charset=utf-8,' + 
+                            encodeURIComponent(gridS),
                     'target': '_blank',
                     'download': finm
                 });
@@ -329,66 +331,5 @@
         }
     });
 })(jQuery);
-
-// hist = [ "49, 1, 6", "52, 3, 5", "42, 5, 6", "21, 4, 6", "36, 4, 6", "70, 3, 6", "70, 1, 3" ]
-// de la 60 gaps iniţial, la 50 gaps
-
-/* până la gaps=40:
-hist=["49, 1, 6",
-  "52, 3, 5",
-  "42, 5, 6",
-  "21, 4, 6",
-  "36, 4, 6",
-  "70, 3, 6",
-  "70, 1, 3",
-  "13, 4, 2",
-  "14, 4, 1",
-  "15, 5, 2",
-  "20, 4, 5",
-  "22, 2, 5",
-  "21, 3, 4",
-  "20, 2, 4",
-  "20, 4, 1",
-  "13, 2, 1",
-  "29, 5, 6",
-  "29, 3, 5",
-  "14, 1, 6",
-  "40, 3, 5",
-  "40, 5, 1",
-  "23, 3, 6",
-  "13, 4, 6",
-  "6, 5, 6",
-  "26, 3, 5",
-  "37, 4, 7",
-  "41, 3, 6",
-  "41, 4, 5",
-  "70, 2, 5",
-  "67, 5, 1",
-  "13, 4, 1",
-  "13, 6, 3",
-  "15, 2, 4",
-  "15, 3, 6",
-  "20, 3, 1",
-  "20, 4, 2",
-  "4, 5, 6",
-  "6, 4, 6",
-  "10, 3, 6",
-  "12, 3, 4",
-  "19, 3, 5",
-  "22, 3, 5",
-  "24, 3, 1",
-  "27, 4, 3",
-  "28, 3, 6",
-  "5, 3, 1",
-  "9, 3, 5",
-  "15, 3, 5",
-  "2, 3, 5",
-  "15, 3, 1",
-  "15, 4, 5",
-  "21, 3, 4",
-  "12, 3, 1",
-  "23, 3, 6",
-  "10, 3, 1"]
-*/
 
 
