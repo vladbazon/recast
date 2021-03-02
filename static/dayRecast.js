@@ -125,6 +125,7 @@
                 if(Self.element.is(':visible')) {
                     Self.orar = Self._set_orar();
                     $('#tools-bar').find('p:gt(0)').show();
+                    $('#tools-bar').css({position:'fixed', top:'3em', left:'21em'});
                 }
                 Self._init();                
             });
