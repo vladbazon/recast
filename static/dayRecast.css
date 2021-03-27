@@ -1,4 +1,18 @@
 body{font:12px/1.511 Verdana, clean, sans-serif;background:#e2d2b9;}
+
+div.twodays {
+    display:grid;
+    grid-template-columns:repeat(2, min-content);
+    grid-column-gap:14em;
+}
+div textarea {
+    font-size:0.9em;
+    color:#448;
+}
+
+#day--1 {grid-column:1}
+#day--2 {grid-column:2}
+
 input { width:25px; }
 a {
     color:blue;
@@ -12,18 +26,13 @@ td+td {  /* all except the first one */
     text-align:center;
     padding-right:2px;
 }
+
 .highlight {background:white;}
-#tools-bar span {
-    margin-left:0.5em;
-    color: navy; 
-    font-size:0.9em;
-}
+
 td.gap-source, td.gap-dest {
     background: yellow;
 }
 
 td:first-child { background:#F4F6F6 }
-button#applyHIST {
-    display:none;
-    margin-left:1em;
-}
+.toKeepStruc {background:LightBlue}
+

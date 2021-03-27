@@ -1,17 +1,18 @@
 (function($) {
-    function BAR() {
+    function BAR(bid) {
         let bar = [
-            '<div id="grid-orar" style="float:left">',
-                '<table border="1" cellspacing="2" cellpadding="1"></table>',
-            '</div>',
-            '<div id="tools-bar" style="float:left;padding-left:2em;margin-top:20px">',
-                '<p style="padding-right:1em"><button title="reÎNCARCĂ orarul iniţial">Load</button><button id="applyHIST">applyHIST</button></p>',
-                '<p><input value="9A"><button title="COMUTĂ orar/orar_clasă">Mark</button></p>',
-                '<p><button title="COMUTĂ orar/orar_ferestre">Gaps</button>&thinsp;<span></span>&thinsp;|<span></span></p>',
-                '<p><button title="INTERSCHIMBĂ orele marcate, pe coloanele respective">SWAP</button></p>',
-                '<p><button title="ANULEAZĂ operaţii SWAP, începând cu ultima">Undo</button></p>',
-                '<p><a title="SALVEAZĂ orarul curent (CSV) şi istoricul SWAP">Export</a></p>',
-            '</div>'
+            `<div id="grid-orar${bid}" style="float:left">`,
+                `<table border="1" cellspacing="2" cellpadding="1"></table>`,
+            `</div>`,
+            `<div id="tools-bar${bid}" style="float:left;padding-left:2em;margin-top:20px">`,
+                `<p style="padding-right:1em"><button title="reÎNCARCĂ orarul iniţial">Load</button><button id="applyHIST${bid}" style="display:none">applyHIST</button></p>`,
+                `<p><input value="9A"><button title="COMUTĂ orar/orar_clasă">Mark</button></p>`,
+                `<p><button title="COMUTĂ orar/orar_ferestre">Gaps</button>&thinsp;<span style="margin-left:0.5em;color:navy;font-size:0.9em;"></span>&thinsp;|&thinsp;<span style="color:navy;font-size:0.9em;"></span></p>`,
+                `<p><input value="7"><button title="(de)marchează structura primelor linii">markStruct</button></p>`,
+                `<p><button title="INTERSCHIMBĂ orele marcate, pe coloanele respective">SWAP</button></p>`,
+                `<p><button title="ANULEAZĂ operaţii SWAP, începând cu ultima">Undo</button></p>`,
+                `<p><a title="SALVEAZĂ orarul curent (CSV) şi istoricul SWAP">Export</a></p>`,
+            `</div>`
         ];
         return $(bar.join(''));
     };
@@ -31,9 +32,17 @@
     };
    
     $.widget("vb.dayRecast", {
+
         _create: function() { 
-            BAR().insertAfter(this.element);
-            $('#tools-bar').find('p:gt(0)').hide();
+            let bid ="";
+            if(this.element.parent().attr('id').indexOf('--') > 0)
+                bid = this.element.parent().attr('id').split('--')[1];
+            BAR(bid).insertAfter(this.element);
+            this.TLB = $('#tools-bar' + bid);
+            this.TLB.find('p:gt(0)').hide();
+            this.GRD = $('#grid-orar' + bid);
+            this.APH = this.TLB.find('#applyHIST' + bid);
+            this.wh = bid || 1;
             this.orar = [];
             this.spread = {};
             this._set_handlers();
@@ -51,10 +60,10 @@
                 orar.push(el.split(','));
             });
             if(collision()) return;      
-            this.spread = set_spread(); 
+            this.spread = _set_spread();
             this.HIST = HIST;
-            return orar; 
-         
+            return orar;
+            
             function collision() {
                 let err = []
                 for(let j=1, m=orar[0].length; j < m; ++j)
@@ -71,8 +80,8 @@
                 }
             };
             
-            function set_spread() {  // clasă => [idx_prof. cu ore la acea clasă]
-                let spread = {};
+            function _set_spread() {  // clasă => [idx_prof. cu ore la acea clasă]
+                let spread = {}; 
                 let m = orar[0].length;
                 for(let i=0, n=orar.length; i < n; i++)
                     for(var j=1; j < m; j++) {
@@ -96,41 +105,41 @@
             $.each(this.orar, function(i, el) {
                 scor += gaps(el);
                 html.push('<tr><td>', el[0], '</td>');
-                for(let i=1, n=el.length; i < n; ++i) {
-                    if(el[i] != '-')
-                        html.push('<td>', el[i], '</td>');
-                    else
-                        html.push('<td>', el[i], '</td>');
-                }
+                for(let i=1, n=el.length; i < n; ++i)
+                    html.push('<td>', el[i], '</td>');
                 html.push('</tr>');
             });
             this.hist = [];
             this.element.prev().hide();
             this.element.hide();
-            $('#grid-orar table').html($(html.join('')));
-            $('#tools-bar').find('span:first')
-                           .text(scor).next().text('');  // initial gaps
+            this.GRD.find('table')
+                    .html($(html.join('')));
+            this.TLB.find('span:first')
+                    .text(scor).next().text('');  // initial gaps
             if(this.HIST.length > 0)
-                $('button#applyHIST').show();
+                $(this.APH).show();
             else 
-                $('button#applyHIST').off();
+                $(this.APH).off();
         },
         
         _set_handlers: function() {
-            var bar = $('#tools-bar'),
-                got = $('#grid-orar table');
-            var Self = this;
+            let bar = this.TLB, //$('#tools-bar'),
+                got = this.GRD.find('table'), //$('#grid-orar table');
+                aph = this.APH;
+            let Self = this;
 
             bar.find('button:first').on('click', function(event) {
                 if(Self.element.is(':visible')) {
                     Self.orar = Self._set_orar();
-                    $('#tools-bar').find('p:gt(0)').show();
-                    $('#tools-bar').css({position:'fixed', top:'3em', left:'21em'});
+                    bar.find('p:gt(0)').show();
+                    let W = Self.wh == 1? '20em' : '53em';
+                    bar.css({position:'fixed', top:'3em', left:W});
                 }
+                // console.log(Self.orar, Self.spread, Self.HIST);                
                 Self._init();                
             });
             
-            $("button#applyHIST").on('click', function(event) {
+            aph.on('click', function(event) {
                 let horar = [],  // NU = Self.orar (modificarea s-ar face pe Self.orar)
                     hst = Self.HIST;
                 for(let i=0, n=Self.orar.length; i < n; i++) {
@@ -162,16 +171,12 @@
                 $.each(horar, function(i, el) {
                     scor += gaps(el);
                     html.push('<tr><td>', el[0], '</td>');
-                    for(let i=1, n=el.length; i < n; ++i) {
-                        if(el[i] != '-')
-                            html.push('<td>', el[i], '</td>');
-                        else
-                            html.push('<td>', el[i], '</td>');
-                    }
+                    for(let i=1, n=el.length; i < n; ++i)
+                        html.push('<td>', el[i], '</td>');
                     html.push('</tr>');
                 });
                 bar.find('span:last').text(scor);
-                $('#grid-orar table').html($(html.join('')));
+                got.html($(html.join('')));
             });
             
             bar.find('button:contains(Mark)').on('click', function(event) {
@@ -179,7 +184,7 @@
                 if(clasa == '') {
                     got.find('td').removeClass('highlight');
                     got.find('tr').show();
-                } else {
+                } else { 
                     if(Self.spread[clasa]) {
                         got.find('tr').toggle();
                         got.find('td:contains(' + clasa + ')')
@@ -187,6 +192,12 @@
                         $(this).prev().val("");
                     } else {alert(clasa + " nu există în orar");}
                 }    
+            });
+            
+            bar.find('button:contains(markStruct)').on('click', function(event) {
+                let nrows = $(this).prev().val();
+                let ks = got.find('tr').slice(0, nrows);
+                ks.find("td:contains('-')").toggleClass("toKeepStruc");
             });
             
             bar.find('button:contains(Gaps)').on('click', function(event) {
@@ -311,7 +322,7 @@
 
             bar.find('a').on('click', function(event){
                 let grid = got[0];
-                let gridS = '';  console.log(Self.element.val());
+                let gridS = ''; 
                 let cols = grid.rows[0].cells.length - 1;
                 for(let i=0, rl=grid.rows.length; i < rl; i++) {
                     for(let j=0; j < cols; j++)
