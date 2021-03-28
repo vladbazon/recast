@@ -4,14 +4,14 @@
             '<div id="grid-orar" style="float:left">',
                 '<table border="1" cellspacing="2" cellpadding="1"></table>',
             '</div>',
-
-            '<div id="tools-bar" style="float:left;padding-left:2em;margin-top:20px">',
+            '<div id="tools-bar" style="float:left;padding-left:2em;margin-top:20px;">',
                 '<p style="padding-right:1em"><button title="(re)încarcă distribuţia INIŢIALĂ a orelor">Load</button></p>',
                 '<p><input value="9A"><button title="Reduce la profesorii clasei / Extinde tabelul redus">Mark</button></p>',
                 '<p><button title="Mută clasa (marcată) în ziua marcată (posibilă)">SWAP</button></p>',
                 '<p><button title="verifică numărul de ore/zi la clase">Verify</button></p>',
                 '<p><button title="anulează operaţii SWAP, începând cu ultima">Undo</button></p>',
                 '<p><a title="salvează distribuţia curentă">Export</a></p>',
+                '<p><em>Total:</em> <span id="totalOreZi"></span></p>',
             '</div>',
         ];
         return $(bar.join(''));
@@ -35,7 +35,7 @@
                 orar.push(el.split(','));
             });
             this.spread = set_spread();  // alert(JSON.stringify(this.spread, null, 2));
-            this.spreadz = set_spreadz();  // alert(JSON.stringify(this.spreadz, null, 2));
+            this.spreadz = set_spreadz();   // alert(JSON.stringify(this.spreadz));
             return orar; // $('#grid-orar').next().html(JSON.stringify(orar, null, 2));
 
             function set_spread() {  // clasă => [idx_prof. cu ore la acea clasă]
@@ -56,16 +56,19 @@
             };
 
             function set_spreadz() {  // clasă => [ore-pe-zi]
-                let spreadz = {};
+                let spreadz = {},
+                    tot = [0,0,0,0,0];
                 for(let i=1, n=orar.length; i < n; i++)
                     for(let j=1; j < 6; j++) {
-                        let qls = orar[i][j].split(' ');
+                        let qls = orar[i][j] && orar[i][j].split(' ');
                         for(let q of qls) {
                             if(! spreadz[q])
                                 spreadz[q] = [0,0,0,0,0];
                             spreadz[q][j-1] ++;
+                            tot[j-1] ++;
                         }
                     }
+                spreadz["total"] = tot;
                 return spreadz;
             };
 
@@ -101,6 +104,7 @@
             this.element.prev().hide();
             this.element.hide();
             $('#grid-orar table').html($(html.join('')));
+            $('#totalOreZi').html(this.spreadz["total"].join(' '));
         },
         
         _set_handlers: function() {
@@ -111,9 +115,12 @@
             bar.find('button:first').on('click', function(event) {
                 if(Self.element.is(':visible')) {
                     Self.orar = Self._set_orar();
-                    $('#tools-bar').find('p:gt(0)').show();
+                    bar.find('p:gt(0)').show().end()
+                       .css({position:'fixed', top:'3em', left:'10em'});
                 }
-                Self._init();                
+                Self._init(); 
+                let w = 20 + got.width() + 'px';
+                bar.css('left', w);
             });
             
             bar.find('button:contains(Mark)').on('click', function(event) {
@@ -198,6 +205,13 @@
                         Self.hist.push([td1.parent().index(), id1, id2].join(', '));
                         td2.append(dCls);
                         dCls.parent().children().find(dCls).remove();
+                        Self.spreadz["total"][id1-1] --;
+                        Self.spreadz["total"][id2-1] ++;
+                        console.log(Self.spreadz[dCls.text()]);
+                        Self.spreadz[dCls.text()][id1-1] --;
+                        Self.spreadz[dCls.text()][id2-1] ++;
+                        console.log(Self.spreadz[dCls.text()]);
+                        $('#totalOreZi').html(Self.spreadz["total"].join(' '));
                     }
                 }
                 got.find('td, div').removeClass('gap-source')
@@ -254,6 +268,7 @@
                         let qls = $(el).text();
                         if(i > 0) {
                             qls = qls.match(/\d*[A-Z]/g);
+                            //qls = qls.match(/9[A-Z]|10[A-Z]|11[A-Z]|12[A-Z]|5|6|7|8/g);
                             if(qls) qls = qls.join(" ");
                         }
                         grd.push(qls);
