@@ -6,3 +6,6 @@ Iar **dayRecast** serveşte pentru modificarea interactivă a orarului unei zile
 
 <img src="dayRecast.png" />
 
+Dacă este vorba de o şcoală cu două schimburi, **pairRecast** poate servi pentru modificarea în paralel, a orarelor celor două schimburi:
+
+<img src="pairRecast.png" />
