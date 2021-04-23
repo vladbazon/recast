@@ -1,0 +1,111 @@
+<!doctype html>
+<html>
+<head>
+    <title>Orar interactiv (două schimburi)</title>
+    <meta name="description" content="Repair gaps in a given school timetable of a day" />
+    <meta name="author" content="Vlad Bazon" />
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="static/pairRecast.css">
+    <script src="../2recast/jquery1124.js"></script>
+    <script src="static/jquery.ui.widget.min.js"></script>
+    <script src="static/pairRecast.js"></script>
+</head>
+<body>
+<div id="pair-container">
+    <div id="Sch1">
+<textarea rows="4" cols="30">
+P01,-,-,-,12E,11A,12B,-
+P02,-,-,-,-,11B,12A,-
+P04,11F,12F,12G,-,-,-,-
+P05,12E,11C,12F,11A,12B,-,-
+P07,-,11E,11G,12G,7Z,-,-
+P08,11A,11D,-,-,-,-,-
+P09,-,12E,8Z,12F,11E,11F,7Z
+P10,-,-,-,12C,12A,7Z,-
+P11,-,-,7Z,8Z,12G,-,-
+P13,-,12B,11B,11D,-,-,-
+P14,8Z,11G,11C,12A,-,-,-
+P15,12C,11B,12A,-,-,-,-
+P16,12F,12G,-,-,-,-,-
+P19,-,-,-,11E,11F,-,-
+P20,12B,12D,-,-,-,-,-
+P21,-,-,-,-,-,11E,-
+P23,11D,7Z,11E,-,-,-,-
+P24,12D,12A,12B,-,-,-,-
+P25,-,-,-,-,-,11C,-
+P27,-,-,11A,12D,-,-,-
+P28,-,-,-,11C,12E,12F,-
+P29,12A,11A,12D,-,-,-,-
+P30,-,-,-,-,-,11G,-
+P33,-,-,-,-,12D,8Z,-
+P34,-,-,-,-,11D,12G,-
+P35,12G,11F,-,-,-,-,-
+P36,-,-,-,11B,12C,12E,-
+P38,-,-,-,-,11C,12C,-
+P39,-,-,-,-,-,11B,-
+P41,-,-,-,-,11G,-,-
+P43,-,-,12E,11F,12F,-,-
+P44,-,-,11F,11G,-,-,-
+P45,-,12C,11D,12B,-,-,-
+P46,-,-,-,7Z,8Z,-,-
+P52,7Z,8Z,12C,-,-,-,-
+</textarea>
+    </div>
+    <div id="Sch2">
+<textarea rows="4" cols="30">
+P01,9B,9D,9G,-,-,-
+P02,10B,10C,9C,9A,-,-
+P03,10D,10G,6Z,9F,9G,-
+P04,-,-,-,9G,9F,-
+P08,-,-,-,-,10C,10D
+P10,6Z,10A,9D,-,-,-
+P11,-,-,-,9B,5Z,-
+P12,-,5Z,10D,10C,10F,6Z
+P15,9F,-,-,-,-,-
+P16,-,-,-,-,9D,9A
+P17,-,-,-,9D,10B,10C
+P18,10C,10B,10G,9C,-,-
+P19,-,-,-,-,-,9B
+P20,-,10F,5Z,6Z,-,-
+P21,9E,10E,10A,-,-,-
+P22,-,-,9E,10A,10D,9C
+P24,-,-,-,-,9E,9F
+P25,9D,9A,10B,-,-,-
+P26,-,-,9F,10F,9A,9D
+P27,-,-,9A,10B,-,-
+P30,10F,9F,10E,-,-,-
+P31,-,10D,10F,5Z,6Z,-
+P32,-,9E,9B,10E,9C,-
+P33,5Z,9C,-,-,-,-
+P34,10G,9G,-,-,-,-
+P35,-,-,-,-,10G,10A
+P36,9G,-,-,-,-,-
+P37,10E,-,-,-,-,-
+P38,9C,-,-,-,-,-
+P39,10A,6Z,-,-,-,-
+P41,-,-,-,-,10E,10F
+P42,9A,9B,10C,10D,-,-
+P44,-,-,-,-,10A,10G
+P45,-,-,-,9E,-,-
+P46,-,-,-,-,-,9E
+P50,-,-,-,10G,9B,-
+</textarea>   
+    </div>
+</div>
+<div id="Operations">
+    <p><input value="9A"><button title="comută orar/orar_clasă">Mark</button></p>
+    <p><button title="comută orar/orar_ferestre, după clasa din Mark">Gaps</button>&thinsp;<span></span>&thinsp;|&thinsp;<span></span>&thinsp;&thinsp;&thinsp;&thinsp;&thinsp;&thinsp;&thinsp;&thinsp;<span></span>&thinsp;|&thinsp;<span></span></p>
+    <p><button title="profesorii cu ore în ambele schimburi / comută">Intersect</button></p>
+    <p><button title="interschimbă orele marcate, pe coloanele respective">SWAP</button></p>
+    <p><button title="anulează operaţii SWAP, începând cu ultima">Undo</button></p>
+    <p><a title="salvează orarele (CSV)">Export</a></p>
+</div>
+
+<script>
+$(function() {
+    $('#pair-container').pairRecast();
+});
+</script>
+
+</body>
+</html>
