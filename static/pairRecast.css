@@ -1,0 +1,50 @@
+body{font:12px/1.511 Verdana, sans-serif;background:#e2e2ba;}
+
+#pair-container {
+    display: grid;
+    width: 500px;
+    grid-template-columns: auto auto;
+    grid-auto-columns: max-content;
+    grid-auto-flow: column;
+    justify-content: start;
+    grid-column-gap: 10px;
+}
+#Sch1 {
+    grid-column: 1;
+}
+#Sch2 {
+    grid-column: 2;
+}
+#Operations {
+   position: fixed;
+   top: 5em;
+   left: 510px; 
+}
+
+#Operations input { width:25px; }
+#Operations a {
+    color:blue;
+    text-decoration:underline;
+    font-size:1.1em;
+    cursor:pointer;
+}
+
+#pair-container td, button {cursor:pointer;}
+#pair-container td+td {  /* all except the first one */
+    font-family:monospace;
+    text-align:center;
+    padding-right:2px;
+}
+#Operations span {
+    color:navy;
+    font-size:0.9em;
+}
+    
+.highlight {background:white;}
+
+#pair-container td.gap-source, td.gap-dest {
+    background: yellow;
+}
+
+#pair-container td:first-child { background:#F4F6F6 }
+
